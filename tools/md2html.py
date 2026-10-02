@@ -19,35 +19,26 @@ from estilo_web import ESTILO  # noqa: E402
 
 
 # Un menu por idioma. La web se publica en ingles en la raiz de docs/ y en
-# castellano bajo docs/es/. Son las siete paginas del contrato por idioma,
-# mas la portada y la del parche MSX2.
+# castellano bajo docs/es/. Las cinco paginas del parche por idioma, mas
+# la portada.
 NAV_EN = [("index.html", "Home"), ("GETTING-STARTED.html", "Start"),
-          ("THE-GAME.html", "The game"),
-          ("THE-CARTRIDGE.html", "The cartridge"),
-          ("THE-CODE.html", "The code"),
-          ("FINDINGS.html", "Findings"),
+          ("THE-FLICKER.html", "The flicker"),
+          ("THE-PATCH.html", "The patch"),
           ("IN-THE-EMULATOR.html", "In the emulator"),
-          ("OPEN-QUESTIONS.html", "Open questions"),
-          ("THE-MSX2-PATCH.html", "MSX2 patch")]
+          ("OPEN-QUESTIONS.html", "Open questions")]
 NAV_ES = [("index.html", "Portada"), ("EMPEZAR.html", "Empezar"),
-          ("EL-JUEGO.html", "El juego"),
-          ("EL-CARTUCHO.html", "El cartucho"),
-          ("EL-CODIGO.html", "El código"),
-          ("HALLAZGOS.html", "Hallazgos"),
+          ("EL-PARPADEO.html", "El parpadeo"),
+          ("EL-PARCHE.html", "El parche"),
           ("EN-EL-EMULADOR.html", "En el emulador"),
-          ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas"),
-          ("EL-PARCHE-MSX2.html", "Parche MSX2")]
+          ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas")]
 
 # Cada documento se llama distinto en cada idioma, asi que el selector de idioma
 # necesita saber cual es la pareja de cada pagina.
 _PAREJAS = [("GETTING-STARTED.html", "EMPEZAR.html"),
-            ("THE-GAME.html", "EL-JUEGO.html"),
-            ("THE-CARTRIDGE.html", "EL-CARTUCHO.html"),
-            ("THE-CODE.html", "EL-CODIGO.html"),
-            ("FINDINGS.html", "HALLAZGOS.html"),
+            ("THE-FLICKER.html", "EL-PARPADEO.html"),
+            ("THE-PATCH.html", "EL-PARCHE.html"),
             ("IN-THE-EMULATOR.html", "EN-EL-EMULADOR.html"),
-            ("OPEN-QUESTIONS.html", "PREGUNTAS-ABIERTAS.html"),
-            ("THE-MSX2-PATCH.html", "EL-PARCHE-MSX2.html")]
+            ("OPEN-QUESTIONS.html", "PREGUNTAS-ABIERTAS.html")]
 PAREJA = {}
 for _en, _es in _PAREJAS:
     PAREJA[_en] = _es

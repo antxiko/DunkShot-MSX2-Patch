@@ -14,6 +14,12 @@ licencia de `LICENSE`.
 
 ## Que hay en este repositorio
 
+Lo principal es un **parche extraoficial**, `parche/dunkshot_msx2.ips`: un
+fichero de diferencias que, aplicado a tu propio volcado, hace que el juego
+use los sprites del MSX2. Contiene solo los bytes que escribe el parche (el
+codigo nuevo y los operandos cambiados), no el juego. No se distribuye ni el
+cartucho original ni el parcheado.
+
 El fichero `src/dunkshot.asm` es el desensamblado comentado del cartucho. Se
 publica para la **preservacion, el estudio y la documentacion** de un titulo
 que es parte de la historia del software del MSX.

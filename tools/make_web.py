@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera la portada de la web, en los dos idiomas.
+"""Genera la portada de la web del PARCHE, en los dos idiomas.
 
 La maquinaria no nombra ningun juego: el nombre, la cabecera, las cifras, los
 hallazgos y la galeria salen de tools/contenido_web.py. Aqui solo van los
@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from estilo_web import ESTILO                                   # noqa: E402
 from contenido_web import (NOMBRE, COMPANIA, PORTADA, HALLAZGOS, GALERIA, LOGOTIPO,  # noqa: E402
-                           CODIGO, DATOS, RUTINAS, densidad)
+                           BYTES, TRAMOS, IPS, MEDIDA, por_cuadro)
 
 
 def mil(n, idioma):
@@ -26,55 +26,48 @@ def mil(n, idioma):
 
 TXT = {
     "es": dict(
-        nav=[("#numbers", "Las cifras"), ("#findings", "Hallazgos"),
-             ("#screens", "Lo que dibuja")],
-        docnav=[("EMPEZAR.html", "Empezar"), ("EL-JUEGO.html", "El juego"),
-                ("EL-CARTUCHO.html", "El cartucho"),
-                ("EL-CODIGO.html", "El código"),
-                ("HALLAZGOS.html", "Hallazgos"),
+        nav=[("#numbers", "Las cifras"), ("#findings", "Lo que hace"),
+             ("#screens", "En openMSX")],
+        docnav=[("EMPEZAR.html", "Empezar"), ("EL-PARPADEO.html", "El parpadeo"),
+                ("EL-PARCHE.html", "El parche"),
                 ("EN-EL-EMULADOR.html", "En el emulador"),
-                ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas"),
-                ("EL-PARCHE-MSX2.html", "Parche MSX2")],
+                ("PREGUNTAS-ABIERTAS.html", "Preguntas abiertas")],
         otro=("../", "In English"),
-        h_num="El cartucho en cifras", h_find="Lo que apareció al desmontarlo",
-        h_scr="Lo que el cartucho dibuja",
-        cifras=[("100 %", "del binario explicado"),
-                (mil(RUTINAS, "es"), "rutinas con nombre"),
-                (densidad("es") + " %", "del listado comentado"),
-                (mil(CODIGO, "es"), "bytes de código"),
-                (mil(DATOS, "es"), "bytes de datos"),
-                ("0", "bytes sin identificar")],
-        nota_scr="Debajo de cada imagen está de dónde sale y qué se está "
-                 "viendo.",
-        pie_leg="Esto es trabajo de documentación y preservación: el código y "
-                "los gráficos siguen siendo de sus autores y de " + COMPANIA + ", y la "
-                "imagen del cartucho no se distribuye.",
+        h_num="El parche en cifras", h_find="Lo que hace, y lo que hubo que saber",
+        h_scr="En openMSX",
+        cifras=[(por_cuadro("original_msx1", "es"), "sprites sin pintar por cuadro, original en MSX1"),
+                (por_cuadro("parcheado_msx2", "es"), "sprites sin pintar por cuadro, parcheado en MSX2"),
+                (f"{MEDIDA['original_msx1'][2]} &rarr; {MEDIDA['parcheado_msx2'][2]}", "en el peor cuadro"),
+                (mil(BYTES, "es"), f"bytes cambiados en {TRAMOS} tramos"),
+                (mil(IPS, "es"), "bytes de IPS"),
+                ("0", "patrones movidos")],
+        nota_scr="Capturas de openMSX con la ROM de cada pie; las órdenes que "
+                 "las sacan están en En el emulador.",
+        pie_leg="Parche extraoficial. El juego es de sus autores y de " + COMPANIA +
+                ", y la imagen del cartucho no se distribuye: solo el IPS.",
     ),
     "en": dict(
-        nav=[("#numbers", "The numbers"), ("#findings", "What turned up"),
-             ("#screens", "What it draws")],
+        nav=[("#numbers", "The numbers"), ("#findings", "What it does"),
+             ("#screens", "In openMSX")],
         docnav=[("GETTING-STARTED.html", "Getting started"),
-                ("THE-GAME.html", "The game"),
-                ("THE-CARTRIDGE.html", "The cartridge"),
-                ("THE-CODE.html", "The code"),
-                ("FINDINGS.html", "Findings"),
+                ("THE-FLICKER.html", "The flicker"),
+                ("THE-PATCH.html", "The patch"),
                 ("IN-THE-EMULATOR.html", "In the emulator"),
-                ("OPEN-QUESTIONS.html", "Open questions"),
-                ("THE-MSX2-PATCH.html", "MSX2 patch")],
+                ("OPEN-QUESTIONS.html", "Open questions")],
         otro=("es/", "En castellano"),
-        h_num="The cartridge in numbers",
-        h_find="What turned up when we took it apart",
-        h_scr="What the cartridge draws",
-        cifras=[("100%", "of the binary explained"),
-                (mil(RUTINAS, "en"), "named routines"),
-                (densidad("en") + "%", "of the listing commented"),
-                (mil(CODIGO, "en"), "bytes of code"),
-                (mil(DATOS, "en"), "bytes of data"),
-                ("0", "bytes unidentified")],
-        nota_scr="Under each picture is where it comes from and what is on it.",
-        pie_leg="This is documentation and preservation work: the code and "
-                "artwork still belong to their authors and to " + COMPANIA + ", and the "
-                "cartridge image is not distributed.",
+        h_num="The patch in numbers",
+        h_find="What it does, and what had to be known",
+        h_scr="In openMSX",
+        cifras=[(por_cuadro("original_msx1", "en"), "sprites not drawn per frame, original on MSX1"),
+                (por_cuadro("parcheado_msx2", "en"), "sprites not drawn per frame, patched on MSX2"),
+                (f"{MEDIDA['original_msx1'][2]} &rarr; {MEDIDA['parcheado_msx2'][2]}", "in the worst frame"),
+                (mil(BYTES, "en"), f"bytes changed in {TRAMOS} stretches"),
+                (mil(IPS, "en"), "bytes of IPS"),
+                ("0", "patterns moved")],
+        nota_scr="openMSX screenshots of the ROM each caption names; the "
+                 "commands that take them are in In the emulator.",
+        pie_leg="Unofficial patch. The game belongs to its authors and to " + COMPANIA +
+                ", and the cartridge image is not distributed: only the IPS.",
     ),
 }
 

@@ -1,17 +1,23 @@
 # Open questions
 
-- The team screens with a human roster (MAKE TEAM, EDIT TEAM, STARTERS,
-  TRADE) and the statistics screen: seen in the emulator, not built from the
-  ROM.
-- The second player's keyboard controls: the code reads rows 3 and 5 of the
-  matrix (`0xBA1F`, `0xBA27`) through the table at `0xBA8D`; exactly which
-  keys they are has not been checked by playing.
-- What S, J and R measure. The game never says; in the code, the skills that
-  decide steals and passes are fields +0x1D and +0x1E of the record.
-- `0x4EEC`: whether `ld hl,(0xE6DF)` is a bug in the original or not. What it
-  does is measured; what it was meant to do is not.
-- The code byte of each waypoint in the plays (0x64, 0x78, 0x3C, 0x28, 0x00).
-- Which of the 160 poses are never used: the animation sequences are in the
-  code, not in a table.
-- The listing carries 113 lines marked SUPOSICION: what has not been measured
-  in openMSX.
+What has not been checked, said plainly:
+
+- **Real hardware.** Everything was measured in openMSX. Nobody has run the
+  patched cartridge on a real MSX2 or MSX1 yet.
+- **Other MSX2 machines.** The MSX2 measurements are on the Philips NMS 8250
+  (50 Hz). The patch only asks the BIOS whether it is an MSX2 (byte 0x002D)
+  and uses nothing specific to that model, but Japanese MSX2s, the MSX2+ and
+  the turbo R have not been tried.
+- **More than eight per line.** When five or six players pile up with the
+  ball and its shadow, more than eight sprites still fall on a line; the VDP
+  then leaves out the farthest ones, with no flicker to share them out.
+  Measured: 1.7 sprites per frame on average, 22 in the worst frame. Whether
+  sharing those out, as the original does, would look better than leaving the
+  ones behind out is a matter of taste that has not been tried.
+- **The second table on an MSX2.** The game still builds the reversed list
+  and copies it to 0x3F00 every frame, where on an MSX2 nobody looks. It
+  costs 128 bytes of VRAM writes per frame; it was left so as not to touch
+  the game's code.
+- **The screens with the sample figure.** TRADE has been seen on the MSX2
+  with the figure in its colours; the team cards (LEFT TEAM, RIGHT TEAM) use
+  the same routine, `viste_jugador`, but have not been seen one by one.

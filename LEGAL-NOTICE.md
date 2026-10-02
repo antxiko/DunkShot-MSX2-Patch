@@ -14,6 +14,12 @@ analysis and the documentation. That is published under the licence in
 
 ## What is in this repository
 
+The main thing is an **unofficial patch**, `parche/dunkshot_msx2.ips`: a
+difference file that, applied to your own dump, makes the game use the
+sprites of the MSX2. It contains only the bytes the patch writes (the new
+code and the changed operands), not the game. Neither the original cartridge
+nor the patched one is distributed.
+
 The file `src/dunkshot.asm` is the commented disassembly of the cartridge. It
 is published for the **preservation, study and documentation** of a title that
 is part of MSX software history.

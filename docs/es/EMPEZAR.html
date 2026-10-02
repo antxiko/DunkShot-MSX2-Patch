@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Empezar — Dunk Shot (HAL Laboratory, 1986)</title>
+<title>Empezar — Dunk Shot — MSX2 patch (HAL Laboratory, 1986)</title>
 <style>
 :root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
   --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
@@ -82,16 +82,29 @@ footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
 .galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
 audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
 </style>
-<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html" style=color:var(--tinta)>Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="EL-PARCHE-MSX2.html">Parche MSX2</a><a href="../GETTING-STARTED.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html" style=color:var(--tinta)>Empezar</a><a href="EL-PARPADEO.html">El parpadeo</a><a href="EL-PARCHE.html">El parche</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../GETTING-STARTED.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
 <h1 id="empezar">Empezar</h1>
-<p>Hace falta Python 3, GNU make, <a href="https://pasmo.speccy.org/">Pasmo</a> y tu propia imagen del cartucho como <code>dunkshot.rom</code> en la raíz del repositorio (32.768 bytes; <code>make comprueba</code> verifica el sha256). La ROM no se distribuye.</p>
-<pre><code>make            # listado, reensamblado, controles y tests
-make imagenes   # las imágenes de la web, desde la ROM
-make web        # la web bilingüe en docs/
-make parche     # el parche MSX2: work/dunkshot_msx2.rom y parche/dunkshot_msx2.ips</code></pre>
-<p><code>make</code> genera <code>src/dunkshot.asm</code> desde el binario y las notas (<code>src/dunkshot.notes</code>), lo reensambla con Pasmo y comprueba que sale la ROM exacta; después pasa los controles que el reensamblado no cubre: que ningún dato se lea como código, que ningún punto de entrada caiga en una zona de datos y que no quede un byte sin asignar.</p>
-<h2 id="las-herramientas">Las herramientas</h2>
-<ul><li><code>tools/z80trace.py</code> y <code>tools/mkasm.py</code>: el trazador y el generador del listado. Los puntos de entrada que el trazado no deduce (el gancho de la interrupción, los ocho <code>jp</code> de 0xB985 y el código huérfano) están en <code>src/dunkshot.entries</code>, cada uno con su motivo.</li><li><code>tools/graficos.py</code>: los cuatro descompresores del cartucho y el dibujo de patrones y sprites. <code>tools/pantallas.py</code> monta cada pantalla en una VRAM; <code>tools/coteja.py</code> la compara con un volcado de openMSX; <code>tools/imagenes.py</code> genera la galería.</li><li><code>tools/sonido.py</code> recorre las trece piezas como las lee el motor.</li><li><code>tools/lanza_vuelca.sh</code> y <code>tools/omsx_vuelca.tcl</code>: un openMSX que pulsa teclas en los instantes que se le dicen y vuelca VRAM, RAM y registros.</li><li><code>tools/parche_msx2.py</code> genera el parche MSX2 y <code>tools/omsx_parpadeo.tcl</code> con <code>tools/lanza_parpadeo.sh</code> mide el parpadeo, cuadro a cuadro (<a href="EL-PARCHE-MSX2.html">El parche MSX2</a>).</li><li><code>tools/densidad.py</code>, <code>tools/huecos.py</code>, <code>tools/margen.py</code> y <code>tools/sin_bautizar.py</code>: la medida de los comentarios.</li></ul>
-<h2 id="las-notas">Las notas</h2>
-<p>El listado no se edita a mano: cada comentario es una directiva del fichero de notas anclada a una dirección (<code>C 0x5F33 texto</code>), cada rutina con nombre una <code>L</code>, y cada bloque de datos una <code>D</code> con su medida. <code>make listado</code> las aplica y <code>tools/valida_c.py</code> avisa si alguna cae a media instrucción o está repetida.</p>
-<footer><p><em>Dunk Shot</em> lo public&oacute; HAL Laboratory para MSX en 1986; son 32 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>
+<p>Aquí se distribuye un parche, <code>parche/dunkshot_msx2.ips</code> (292 bytes), nunca una imagen del cartucho. Hace falta tu propio volcado de <b>Dunk Shot</b> (HAL Laboratory, 1986), el cartucho de 32 KB con sha256 <code>a1891e038566596a9f67067b8ea4694709aa9fee93c8ac0379360b30ea3abe62</code>.</p>
+<h2 id="como-aplicarlo">Cómo aplicarlo</h2>
+<p>Con cualquier herramienta de IPS (Lunar IPS, Floating IPS, <code>flips</code>...), o con estas líneas de Python:</p>
+<pre><code>rom = bytearray(open(&quot;dunkshot.rom&quot;, &quot;rb&quot;).read())
+ips = open(&quot;parche/dunkshot_msx2.ips&quot;, &quot;rb&quot;).read()
+i = 5
+while ips[i:i + 3] != b&quot;EOF&quot;:
+    a, n = int.from_bytes(ips[i:i + 3], &quot;big&quot;), int.from_bytes(ips[i + 3:i + 5], &quot;big&quot;)
+    rom[a:a + n] = ips[i + 5:i + 5 + n]
+    i += 5 + n
+open(&quot;dunkshot_msx2.rom&quot;, &quot;wb&quot;).write(rom)</code></pre>
+<p>El resultado tiene que dar sha256 <code>e5e14b0f7b188b77ae7b8daa28d98ee1e8c9bfc3d6479b9b93c0afbfd1037e6c</code>. Es un cartucho de 32 KB sin mapeador. En openMSX:</p>
+<pre><code>openmsx -machine Philips_NMS_8250 -cart dunkshot_msx2.rom</code></pre>
+<p>Debería valer cualquier MSX2; en un MSX1 se juega como el original, con su parpadeo.</p>
+<h2 id="como-generarlo">Cómo generarlo</h2>
+<p>Hace falta Python 3, GNU make, <a href="https://pasmo.speccy.org/">Pasmo</a> y tu volcado como <code>dunkshot.rom</code> en la raíz del repositorio:</p>
+<pre><code>make            # el listado, el reensamblado, los controles, el parche y los tests
+make parche     # solo el parche: work/dunkshot_msx2.rom y parche/dunkshot_msx2.ips
+make web        # esta web, en docs/</code></pre>
+<p><code>tools/parche_msx2.py</code> ensambla los trozos nuevos con Pasmo, comprueba que cada byte que pisa es el que espera, parchea los operandos y escribe la ROM parcheada, el IPS y <code>parche/parche_msx2.asm</code>, el listado del código nuevo. <code>tests/test_parche.py</code> comprueba que el IPS devuelve exactamente esa ROM y que solo toca los 24 tramos que declara.</p>
+<h2 id="que-mas-hay-en-el-repositorio">Qué más hay en el repositorio</h2>
+<p>Este repositorio parte del <a href="https://antxiko.github.io/DunkShot-disassembly/es/">desensamblado comentado de Dunk Shot</a>, con su historial: <code>src/dunkshot.asm</code> es el listado que reensambla el original byte a byte, y cada dirección de estas páginas se puede buscar allí. Las herramientas del desensamblado siguen aquí (<code>make</code> las pasa); las del parche son:</p>
+<ul><li><code>tools/parche_msx2.py</code>: el parche.</li><li><code>tools/omsx_parpadeo.tcl</code> y <code>tools/lanza_parpadeo.sh</code>: un openMSX que cuenta, cada cuadro, los sprites que el VDP no pinta (<a href="EN-EL-EMULADOR.html">En el emulador</a>).</li></ul>
+<footer><p><em>Dunk Shot</em> lo public&oacute; HAL Laboratory para MSX en 1986; son 32 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Esto es un parche extraoficial: aqu&iacute; solo se distribuye el fichero de diferencias, nunca la imagen del cartucho.</p></footer></div>

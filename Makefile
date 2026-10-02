@@ -1,4 +1,4 @@
-# Dunk Shot (HAL Laboratory, MSX1) - desensamblado
+# Dunk Shot (HAL Laboratory, MSX1) - el parche MSX2, sobre su desensamblado
 #
 # El orden de las cosas: trazar el flujo -> generar el listado -> comprobar que
 # vuelve a dar la ROM byte a byte -> las comprobaciones que el reensamblado NO
@@ -14,7 +14,7 @@ WORK     = work
 ORG      = 0x4000
 TITULO   = DUNK SHOT - HAL Laboratory - MSX1 - cartucho de 32 KB en las paginas 1 y 2
 
-all: listado verify sanity test
+all: listado verify sanity parche test
 
 $(ROM):
 	@echo "=================================================================="
@@ -76,9 +76,11 @@ test:
 	@echo "=================================================================="
 	@python3 -m unittest discover -s tests -v
 
-# LAS IMAGENES, montadas desde la ROM con tools/pantallas.py: ni una captura.
+# LAS IMAGENES del desensamblado, montadas desde la ROM con tools/pantallas.py.
+# Aqui van a work/: la web del parche solo usa el rotulo, las poses y los
+# sprites fijos de esas (copiados en docs/imagenes) y capturas de openMSX.
 imagenes: $(ROM)
-	python3 tools/imagenes.py $(ROM) docs/imagenes
+	python3 tools/imagenes.py $(ROM) $(WORK)/imagenes
 
 # Y la prueba de que son las de verdad: cada pantalla contra un volcado de
 # VRAM de openMSX, byte a byte (los volcados, en work/: ver coteja_todo.py).
@@ -86,7 +88,7 @@ coteja: $(ROM)
 	@python3 tools/coteja_todo.py $(ROM)
 
 # LA WEB. Bilingue: el ingles en docs/ y el castellano en docs/es/.
-web: imagenes
+web:
 	python3 tools/md2html.py docs en
 	python3 tools/md2html.py docs/es es
 	python3 tools/make_web.py docs/imagenes docs/index.html en

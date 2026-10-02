@@ -1,338 +1,177 @@
 #!/usr/bin/env python3
-"""EL CONTENIDO de la web de este cartucho: lo unico que es de este juego.
+"""EL CONTENIDO de la web de este parche: lo unico que es de este proyecto.
 
 md2html.py y make_web.py son la maquinaria y no llevan dentro el nombre de
 ningun juego: lo leen de aqui.
 
-Las cifras estan medidas sobre este cartucho: CODIGO y DATOS los imprime
-tools/presupuesto.py (make sanity); INSTRUCCIONES y COMENTARIOS, tools/
-densidad.py (make densidad), que da tambien RUTINAS.
+Las cifras estan medidas, y tests/test_web.py las coteja:
+  - BYTES, TRAMOS e IPS: los imprime `make parche` (tools/parche_msx2.py) y
+    los cuenta el test sobre parche/dunkshot_msx2.ips.
+  - Las de parpadeo: work/p_msx1_antes, work/p_msx1_d4 y work/p_msx2_d4,
+    tools/lanza_parpadeo.sh (docs/IN-THE-EMULATOR.md tiene las ordenes).
 """
 
-NOMBRE = "Dunk Shot"
+NOMBRE = "Dunk Shot — MSX2 patch"
 COMPANIA = "HAL Laboratory"
-CATALOGO = ""
 ANIO = 1986
-REPOSITORIO = "https://github.com/antxiko/DunkShot-disassembly"
+REPOSITORIO = "https://github.com/antxiko/DunkShot-MSX2-Patch"
+DESENSAMBLADO = "https://antxiko.github.io/DunkShot-disassembly/"
 
-CODIGO = 20642
-DATOS = 12126
-RUTINAS = 1289
-INSTRUCCIONES = 10690
-COMENTARIOS = 4614
+# El parche (make parche)
+BYTES = 164
+TRAMOS = 24
+IPS = 292
+SHA_ORIGINAL = "a1891e038566596a9f67067b8ea4694709aa9fee93c8ac0379360b30ea3abe62"
+SHA_PARCHEADO = "e5e14b0f7b188b77ae7b8daa28d98ee1e8c9bfc3d6479b9b93c0afbfd1037e6c"
+
+# La medida (tools/lanza_parpadeo.sh, 30 s de partido): (cuadros, sprites sin pintar, peor cuadro)
+MEDIDA = {
+    "original_msx1": (1798, 119936, 166),
+    "parcheado_msx1": (1798, 124875, 175),
+    "parcheado_msx2": (1505, 2513, 22),
+}
 
 
-def densidad(idioma):
-    """El porcentaje comentado, con la coma o el punto de cada idioma."""
-    d = "%.1f" % (100.0 * COMENTARIOS / INSTRUCCIONES)
+def por_cuadro(clave, idioma):
+    """Sprites sin pintar por cuadro, con un decimal y la coma o el punto de cada idioma."""
+    cuadros, sobrantes, _ = MEDIDA[clave]
+    d = "%.1f" % (sobrantes / cuadros)
     return d.replace(".", ",") if idioma == "es" else d
 
 
 PIE_LEGAL = {
     "es": "<em>Dunk Shot</em> lo public&oacute; HAL Laboratory para MSX en 1986; "
           "son 32 KB. Todos los derechos sobre el juego siguen siendo de sus "
-          "titulares. Este trabajo es de preservaci&oacute;n, estudio y "
-          "documentaci&oacute;n, y la imagen del cartucho no se distribuye.",
+          "titulares. Esto es un parche extraoficial: aqu&iacute; solo se "
+          "distribuye el fichero de diferencias, nunca la imagen del cartucho.",
     "en": "<em>Dunk Shot</em> was published by HAL Laboratory for the MSX in 1986; "
           "it is 32 KB. All rights in the game remain with their holders. This "
-          "is preservation, study and documentation work, and the cartridge "
-          "image is not distributed.",
+          "is an unofficial patch: only the difference file is distributed "
+          "here, never the cartridge image.",
 }
 
 PORTADA = {
     "es": dict(
-        titulo="Dunk Shot (MSX) - desensamblado comentado",
-        claim="Baloncesto de tres contra tres en una pista de 56 columnas que se "
-              "asoma por una ventana de 32, jugadores hechos de cuatro sprites, "
-              "equipos de la máquina que se fabrican por nivel y se graban en "
-              "cinta como un BSAVE. Todo dibujado desde la ROM.",
+        titulo="Dunk Shot (MSX) - el parche MSX2 contra el parpadeo",
+        claim="El baloncesto de HAL Laboratory parpadea porque cada jugador son "
+              "cuatro sprites y el MSX1 pinta cuatro por línea. Un MSX2 pinta "
+              "ocho: este parche de 164 bytes lleva el juego a SCREEN 4 y apaga "
+              "el reparto, y en un MSX1 se sigue jugando como el original.",
         ficha=["HAL Laboratory - <b>(c) 1986 HAL Laboratory</b>",
-               "Cartucho de <b>32 KB</b>", "<b>MSX</b>",
-               "Volcado <b>a1891e03...</b>"],
-        aviso="<b>Aquí no hay ninguna captura.</b> Todas las imágenes están "
-              "<b>dibujadas desde los bytes de la ROM</b> con las tablas del "
-              "propio cartucho: el logotipo, el título y sus menús, la pista "
-              "entera en sus tres colores, el partido, la ficha de equipo, las "
-              "160 poses de los jugadores y sus 32 aspectos. Seis pantallas están "
-              "<b>cotejadas contra openMSX</b> byte a byte en ocho volcados, con "
-              "0 diferencias, y los 24 sprites de los seis jugadores del saque "
-              "también. El listado y las cifras se reproducen con "
-              "<code>make</code>, y el reensamblado devuelve la ROM <b>byte a "
-              "byte</b>.",
+               "Parche IPS de <b>292 bytes</b>, extraoficial",
+               "<b>MSX2</b> (y MSX1 tal cual)",
+               "Original <b>a1891e03...</b>"],
+        aviso="<b>Probado en openMSX, todavía no en una máquina real.</b> Las "
+              "capturas son de la ROM parcheada corriendo en openMSX (un MSX1 y "
+              "un Philips NMS 8250), y las cifras salen de una sonda que cuenta, "
+              "cuadro a cuadro, los sprites que el VDP no pinta. No se "
+              "distribuye ninguna ROM: solo el IPS. Sale del "
+              "<a href=\"" + DESENSAMBLADO + "es/\">desensamblado comentado</a>, "
+              "donde se puede buscar cada dirección.",
     ),
     "en": dict(
-        titulo="Dunk Shot (MSX) - a commented disassembly",
-        claim="Three-on-three basketball on a 56-column court seen through a "
-              "32-column window, players made of four sprites, computer teams "
-              "generated by level and saved to tape as a BSAVE. All drawn from "
-              "the ROM.",
+        titulo="Dunk Shot (MSX) - the MSX2 patch against the flicker",
+        claim="HAL Laboratory's basketball flickers because every player is "
+              "four sprites and the MSX1 draws four per line. An MSX2 draws "
+              "eight: this 164-byte patch takes the game to SCREEN 4 and turns "
+              "the sharing off, and on an MSX1 it still plays as the original.",
         ficha=["HAL Laboratory - <b>(c) 1986 HAL Laboratory</b>",
-               "A <b>32 KB</b> cartridge", "<b>MSX</b>",
-               "Dump <b>a1891e03...</b>"],
-        aviso="<b>Not one capture here.</b> Every picture is <b>drawn from the "
-              "bytes of the ROM</b> with the cartridge's own tables: the logo, "
-              "the title and its menus, the whole court in its three colours, "
-              "the match, the team card, the players' 160 poses and their 32 "
-              "looks. Six screens are <b>checked against openMSX</b> byte for "
-              "byte in eight dumps, with 0 differences, and so are the 24 "
-              "sprites of the six players at the tip-off. The listing and the "
-              "numbers are reproducible with <code>make</code>, and "
-              "reassembling gives back the ROM <b>byte for byte</b>.",
+               "A <b>292-byte</b> IPS patch, unofficial",
+               "<b>MSX2</b> (and MSX1 as it was)",
+               "Original <b>a1891e03...</b>"],
+        aviso="<b>Tested in openMSX, not yet on real hardware.</b> The "
+              "screenshots are of the patched ROM running in openMSX (an MSX1 "
+              "and a Philips NMS 8250), and the numbers come from a probe that "
+              "counts, frame by frame, the sprites the VDP does not draw. No ROM "
+              "is distributed: only the IPS. It comes from the "
+              "<a href=\"" + DESENSAMBLADO + "\">commented disassembly</a>, where "
+              "every address can be looked up.",
     ),
 }
 
 HALLAZGOS = {
     "es": [
-        ("La pista mide 56 columnas y se ve por una ventana de 32",
-         "<p>Toda la pista, con las gradas y la pancarta SUPER PLAYERS DUNK SHOT "
-         "* HAL LABORATORY, es un mapa de 56 &times; 24 patrones comprimido en "
-         "<code>0xB69E</code>. No hay desplazamiento por hardware: "
-         "<code>0x5F33</code> copia a la tabla de nombres, fila a fila, las 32 "
-         "columnas que empiezan en la de <code>0xE830</code> (de la 0 a la 24), "
-         "y <code>0x5E7C</code> la mueve de columna en columna cuando el balón "
-         "cruza el centro. El marcador de 21 &times; 4 (<code>0x77AB</code>) va "
-         "encima, en la columna 6.</p>"),
-        ("Cada jugador son cuatro sprites, y de ahí el parpadeo",
-         "<p>Pelo, piel de arriba, camiseta y piel de abajo: cuatro sprites de "
-         "16 &times; 16 por jugador, seis jugadores, más la red, el balón, su "
-         "sombra y la flecha. El TMS9918 solo pinta cuatro sprites por línea, "
-         "así que <code>0x5E1B</code> ordena los siete grupos por profundidad, "
-         "<code>0x5C0B</code> los monta en ese orden, <code>0x5BAB</code> los "
-         "copia también al revés y los dos órdenes van a dos tablas de "
-         "atributos (0x1B00 y 0x1F00) que el registro 5 alterna cada cuadro "
-         "(<code>0x5B77</code>): un cuadro van delante los cercanos y al "
-         "siguiente los lejanos. El parpadeo está "
-         "programado a propósito. En un MSX2, con ocho sprites por línea, "
-         "<a href=\"EL-PARCHE-MSX2.html\">un parche de 164 bytes</a> lo baja de "
-         "66,7 sprites sin pintar por cuadro a 1,7.</p>"),
-        ("Las 160 poses y los 32 aspectos",
-         "<p>Una pose son cuatro números de patrón (<code>0xA4CE</code>) y "
-         "cuatro desplazamientos (<code>0xA38E</code>, uno por grupo de cuatro "
-         "poses) que <code>0x5C40</code> resta de la posición de los pies; los "
-         "196 patrones viven en RAM, descomprimidos de <code>0x9725</code>, "
-         "<code>0x9B08</code>, <code>0x9F80</code> y <code>0xA360</code>. El "
-         "aspecto de cada jugador es una de las 32 parejas de "
-         "<code>0x80E4</code> (piel 0x0B, 0x0A o 0x01 y once colores de pelo) y "
-         "la camiseta es el color del equipo (<code>0xEA2C</code>/"
-         "<code>0xEA5C</code>).</p><p>Pose, patrones y colores están cotejados "
-         "en los seis jugadores de dos volcados de openMSX.</p>"),
-        ("Los equipos de la máquina se fabrican por nivel",
-         "<p>ELM, JNR, HIG, COL, YUG, ESP, USA y PRO no son plantillas "
-         "guardadas: son los niveles 1 a 8. Al elegir uno, <code>0x72CA</code> "
-         "genera ocho jugadores con 30, 20 y 25 puntos de habilidad más 30 por "
-         "cada nivel por encima del primero, y un aspecto al azar sacado del "
-         "registro R del Z80. El nombre se copia de la lista de "
-         "<code>0x7CA1</code> y el nivel se guarda en el byte 3 del equipo.</p>"),
-        ("Los equipos se graban en cinta como un BSAVE",
-         "<p>SAVE DATA escribe con la BIOS de casete el bloque del equipo (0xEC "
-         "bytes: nombre, nivel, color y ocho jugadores de 29) con la cabecera "
-         "de los binarios, diez 0xD0, y un nombre de seis letras: las tres del "
-         "equipo y tres 0x7F (<code>0x8C33</code>). LOAD DATA lo busca y lo lee "
-         "(<code>0x8C71</code>) y VERIFY lo compara byte a byte "
-         "(<code>0x8C87</code>).</p>"),
-        ("Tres pistas, una tabla de colores cada una",
-         "<p>COLOR OF COURT elige entre tres tablas de color comprimidas "
-         "(<code>0xABA8</code>, <code>0xACB0</code> y <code>0xADB8</code>: 264 "
-         "bytes cada una, 2.000 al descomprimir) para los mismos 250 patrones. "
-         "Verde, azul y roja; las gradas y la pancarta no cambian.</p>"),
-        ("Las jugadas de la máquina",
-         "<p>La tabla de 720 bytes de <code>0xAF5F</code> son cinco formaciones "
-         "con seis variantes cada una, y en cada variante un guion de ocho "
-         "bytes por jugador: una espera y puntos (Y, X, código) hasta un 0x80. "
-         "<code>0x6F48</code> elige la variante con la formación en curso y un "
-         "bit al azar, y el botón 2 del equipo con balón en campo contrario "
-         "pasa a la siguiente.</p>"),
-        ("Lo que no se pinta y lo que no corre nadie",
-         "<p>Tres patrones de la pista (0x73, 0x85 y 0x86) y la E y la S de un "
-         "ESC del juego de patrones del logotipo (0xFB, 0xFC) no salen nunca; "
-         "la C (0xFD) sí, en el título. Un patrón de sprite, el 195, no lo usa "
-         "ninguna pose. Y diecisiete trozos de código a los que no se llega: "
-         "entradas alternativas, un contador de cinco cifras "
-         "(<code>0x7AAE</code>) y una rutina que escribe un cero en la propia "
-         "ROM (<code>0x8B3C</code>), de cuando el programa corría en RAM.</p>"
-         "<p>En <code>0x4EEC</code>, además, todo apunta a un fallo del "
-         "original: carga <code>ld hl,(0xE6DF)</code> donde el código vecino "
-         "hace pensar en <code>ld hl,0xE6DF</code>, y compara y escribe en la "
-         "dirección que forman &laquo;quién tiró&raquo; y &laquo;saltador "
-         "izquierdo&raquo;, que al arrancar es 0xFFFF.</p>"),
+        ("El parpadeo lo gestiona el juego",
+         "<p>Cada cuadro <code>0x5E1B</code> ordena los siete grupos por "
+         "profundidad, <code>0x5C0B</code> monta sus atributos en ese orden, "
+         "<code>0x5BAB</code> los copia también al revés y la interrupción "
+         "(<code>0x5B77</code>) enseña una u otra tabla: un cuadro van delante "
+         "los cercanos y al siguiente los lejanos. En un MSX2 el parche deja "
+         "siempre la ordenada: el más cercano delante y sin cambiar de un "
+         "cuadro a otro.</p>"),
+        ("En el modo 2, colores primero y atributos en +0x200",
+         "<p>El registro 5 señala un bloque de 1 KB: la tabla de colores de "
+         "sprite, 16 bytes por sprite, ocupa la primera mitad, y los atributos "
+         "van 0x200 más allá. Ponerlos al revés deja la pantalla sin un solo "
+         "sprite, y eso fue lo primero que salió.</p>"),
+        ("El único sitio libre era 0x3C00",
+         "<p>Bajo los 16 KB del MSX1 el juego no usa nada de 0x3C00 a 0x3FFF: "
+         "colores en 0x3C00, atributos en 0x3E00 y la segunda tabla del MSX1 en "
+         "0x3F00. No se mueve ni un patrón, y el mismo fichero vale en los dos "
+         "MSX.</p>"),
+        ("El código nuevo, en huérfanos del cartucho",
+         "<p>El relleno de 0xBFD4 y tres rutinas que no llama nadie "
+         "(<code>0x6EA0</code>, <code>0x6F30</code>, <code>0x7AAE</code>), "
+         "encontradas al trazar el desensamblado. Y la figura de muestra de "
+         "los menús de equipo conserva sus colores: el modo 2 no lee el color "
+         "del atributo, así que el parche se los copia a la tabla de "
+         "colores.</p>"),
     ],
     "en": [
-        ("The court is 56 columns wide and is seen through a 32-column window",
-         "<p>The whole court, with the stands and the SUPER PLAYERS DUNK SHOT * "
-         "HAL LABORATORY banner, is a 56 &times; 24 map of patterns compressed "
-         "at <code>0xB69E</code>. There is no hardware scrolling: "
-         "<code>0x5F33</code> copies into the name table, row by row, the 32 "
-         "columns starting at the one in <code>0xE830</code> (0 to 24), and "
-         "<code>0x5E7C</code> moves it one column at a time when the ball "
-         "crosses the centre. The 21 &times; 4 scoreboard (<code>0x77AB</code>) "
-         "goes on top, at column 6.</p>"),
-        ("Every player is four sprites, hence the flicker",
-         "<p>Hair, upper skin, shirt and lower skin: four 16 &times; 16 sprites "
-         "per player, six players, plus the net, the ball, its shadow and the "
-         "arrow. The TMS9918 only draws four sprites per line, so "
-         "<code>0x5E1B</code> sorts the seven groups by depth, <code>0x5C0B</code> "
-         "builds them in that order, <code>0x5BAB</code> copies them reversed "
-         "as well, and the two orders go to two attribute tables (0x1B00 and "
-         "0x1F00) that register 5 alternates every frame (<code>0x5B77</code>): "
-         "one frame the near players are in front, the next the far ones. The "
-         "flicker is "
-         "deliberate. On an MSX2, with eight sprites per line, "
-         "<a href=\"THE-MSX2-PATCH.html\">a 164-byte patch</a> brings it down "
-         "from 66.7 sprites not drawn per frame to 1.7.</p>"),
-        ("The 160 poses and the 32 looks",
-         "<p>A pose is four pattern numbers (<code>0xA4CE</code>) and four "
-         "offsets (<code>0xA38E</code>, one per group of four poses) that "
-         "<code>0x5C40</code> subtracts from the position of the feet; the 196 "
-         "patterns live in RAM, decompressed from <code>0x9725</code>, "
-         "<code>0x9B08</code>, <code>0x9F80</code> and <code>0xA360</code>. "
-         "Each player's look is one of the 32 pairs at <code>0x80E4</code> "
-         "(skin 0x0B, 0x0A or 0x01 and eleven hair colours) and the shirt is "
-         "the team colour (<code>0xEA2C</code>/<code>0xEA5C</code>).</p><p>Pose, "
-         "patterns and colours are checked on the six players of two openMSX "
-         "dumps.</p>"),
-        ("Computer teams are generated by level",
-         "<p>ELM, JNR, HIG, COL, YUG, ESP, USA and PRO are not stored rosters: "
-         "they are levels 1 to 8. When one is chosen, <code>0x72CA</code> "
-         "generates eight players with 30, 20 and 25 skill points plus 30 for "
-         "each level above the first, and a random look taken from the Z80's "
-         "R register. The name is copied from the list at <code>0x7CA1</code> "
-         "and the level is kept in byte 3 of the team.</p>"),
-        ("Teams are saved to tape as a BSAVE",
-         "<p>SAVE DATA writes the team block (0xEC bytes: name, level, colour "
-         "and eight 29-byte players) with the cassette BIOS, using the binary "
-         "header, ten 0xD0 bytes, and a six-letter name: the team's three "
-         "letters and three 0x7F (<code>0x8C33</code>). LOAD DATA finds and "
-         "reads it (<code>0x8C71</code>) and VERIFY compares it byte for byte "
-         "(<code>0x8C87</code>).</p>"),
-        ("Three courts, one colour table each",
-         "<p>COLOR OF COURT chooses between three compressed colour tables "
-         "(<code>0xABA8</code>, <code>0xACB0</code> and <code>0xADB8</code>: "
-         "264 bytes each, 2,000 when decompressed) for the same 250 patterns. "
-         "Green, blue and red; the stands and the banner do not change.</p>"),
-        ("The computer's plays",
-         "<p>The 720-byte table at <code>0xAF5F</code> is five formations with "
-         "six variants each, and in every variant an eight-byte script per "
-         "player: a delay and waypoints (Y, X, code) up to a 0x80. "
-         "<code>0x6F48</code> picks the variant from the current formation and "
-         "a random bit, and button 2 of the team with the ball in the "
-         "opponent's half moves on to the next one.</p>"),
-        ("What is never drawn and what nobody runs",
-         "<p>Three court patterns (0x73, 0x85 and 0x86) and the E and S of an "
-         "ESC in the logo's pattern set (0xFB, 0xFC) are never shown; the C "
-         "(0xFD) is, in the title. One sprite pattern, number 195, is used by "
-         "no pose. And seventeen pieces of code nobody reaches: alternative "
-         "entries, a five-digit counter (<code>0x7AAE</code>) and a routine "
-         "that writes a zero into the ROM itself (<code>0x8B3C</code>), from "
-         "when the program ran in RAM.</p><p>At <code>0x4EEC</code>, besides, "
-         "everything points to a bug in the original: it loads "
-         "<code>ld hl,(0xE6DF)</code> where the surrounding code suggests "
-         "<code>ld hl,0xE6DF</code>, and compares and writes at the address "
-         "formed by &ldquo;who shot&rdquo; and &ldquo;left jumper&rdquo;, which "
-         "is 0xFFFF at start-up.</p>"),
+        ("The game manages the flicker",
+         "<p>Every frame <code>0x5E1B</code> sorts the seven groups by depth, "
+         "<code>0x5C0B</code> builds their attributes in that order, "
+         "<code>0x5BAB</code> copies them reversed as well and the interrupt "
+         "(<code>0x5B77</code>) shows one table or the other: one frame the "
+         "near players are in front, the next the far ones. On an MSX2 the "
+         "patch always leaves the sorted one: the nearest in front, and no "
+         "change from frame to frame.</p>"),
+        ("In mode 2, colours first and attributes at +0x200",
+         "<p>Register 5 points at a 1 KB block: the sprite colour table, 16 "
+         "bytes per sprite, takes the first half, and the attributes sit 0x200 "
+         "further on. Put them the other way round and the screen has not a "
+         "single sprite, which is the first thing that came out.</p>"),
+        ("The only free room was 0x3C00",
+         "<p>Below the 16 KB of the MSX1 the game uses nothing from 0x3C00 to "
+         "0x3FFF: colours at 0x3C00, attributes at 0x3E00 and the MSX1's second "
+         "table at 0x3F00. Not one pattern moves, and the same file works on "
+         "both MSXs.</p>"),
+        ("The new code, in the cartridge's orphans",
+         "<p>The filler at 0xBFD4 and three routines nobody calls "
+         "(<code>0x6EA0</code>, <code>0x6F30</code>, <code>0x7AAE</code>), found "
+         "when the disassembly was traced. And the sample figure of the team "
+         "menus keeps its colours: mode 2 does not read the attribute's colour, "
+         "so the patch copies them into the colour table.</p>"),
     ],
 }
 
-# La cabecera: el rotulo del titulo, dibujado desde la ROM (tools/imagenes.py)
+# La cabecera: el rotulo del titulo, dibujado desde la ROM por el desensamblado
 LOGOTIPO = "rotulo.png"
 
 GALERIA = [
-    ("titulo.png",
-     "El título: las 17 filas de la tabla de nombres de <code>0xB0FE</code>, los "
-     "80 patrones del logotipo (<code>0xB33E</code>) con sus colores "
-     "(<code>0xB491</code>), los nombres de los equipos y los créditos de "
-     "<code>0x7D5A</code>. Cotejado contra openMSX en dos instantes: 0 "
-     "diferencias.",
-     "The title: the 17 rows of the name table at <code>0xB0FE</code>, the 80 "
-     "logo patterns (<code>0xB33E</code>) with their colours "
-     "(<code>0xB491</code>), the team names and the credits at "
-     "<code>0x7D5A</code>. Checked against openMSX at two instants: 0 "
-     "differences."),
-    ("menu_titulo.png",
-     "El primer menú sobre el título: el cuadro de <code>0x7FC1</code>, las "
-     "cuatro opciones de <code>0x7D32</code> y la bola del cursor "
-     "(<code>0x8AC9</code>). Cotejado: 0 diferencias.",
-     "The first menu over the title: the box from <code>0x7FC1</code>, the four "
-     "options at <code>0x7D32</code> and the cursor ball (<code>0x8AC9</code>). "
-     "Checked: 0 differences."),
-    ("setup.png",
-     "SET-UP: la tabla de nombres entera de <code>0xB22A</code>, los nombres, las "
-     "marcas de LENGTH OF HALF y COLOR OF COURT (<code>0x81BB</code>, "
-     "<code>0x81DC</code>) y el cursor. Cotejado: 0 diferencias.",
-     "SET-UP: the whole name table at <code>0xB22A</code>, the names, the LENGTH "
-     "OF HALF and COLOR OF COURT marks (<code>0x81BB</code>, <code>0x81DC</code>) "
-     "and the cursor. Checked: 0 differences."),
-    ("equipo.png",
-     "La pantalla de equipo con la ficha de un equipo de la máquina: el menú de "
-     "<code>0x7CD3</code>, el cuadro de la ficha (<code>0x7B75</code>) con la "
-     "barra del color y el nombre, y COMPUTER TEAM LEVEL 1 (<code>0x8B81</code>). "
-     "Cotejado: 0 diferencias.",
-     "The team screen with a computer team's card: the menu at "
-     "<code>0x7CD3</code>, the card box (<code>0x7B75</code>) with the colour bar "
-     "and the name, and COMPUTER TEAM LEVEL 1 (<code>0x8B81</code>). Checked: 0 "
-     "differences."),
-    ("cinta.png",
-     "LOAD DATA sin cinta: SURE? y encima ERROR! (<code>0x870F</code>, "
-     "<code>0x8740</code>). Cotejado contra los dos volcados: 0 diferencias.",
-     "LOAD DATA with no tape: SURE? and ERROR! over it (<code>0x870F</code>, "
-     "<code>0x8740</code>). Checked against both dumps: 0 differences."),
-    ("partido.png",
-     "El partido al saque con la ventana en la columna 12: las 24 filas del mapa "
-     "(<code>0x5F33</code>) y el marcador de <code>0x77AB</code> relleno por "
-     "<code>0x7A17</code>. Cotejado contra dos volcados: 0 diferencias. Los "
-     "jugadores son sprites y van aparte.",
-     "The match at the tip-off with the window at column 12: the 24 rows of the "
-     "map (<code>0x5F33</code>) and the scoreboard from <code>0x77AB</code> "
-     "filled in by <code>0x7A17</code>. Checked against two dumps: 0 differences. "
-     "The players are sprites and come separately."),
-    ("pista_area1.png",
-     "La pista entera, 56 columnas, con la primera tabla de color "
-     "(<code>0xABA8</code>): la verde. El juego enseña 32 columnas cada vez.",
-     "The whole court, 56 columns, with the first colour table "
-     "(<code>0xABA8</code>): the green one. The game shows 32 columns at a time."),
-    ("pista_area2.png",
-     "La misma pista con la segunda tabla de color (<code>0xACB0</code>): la azul.",
-     "The same court with the second colour table (<code>0xACB0</code>): the blue "
-     "one."),
-    ("pista_area3.png",
-     "Y con la tercera (<code>0xADB8</code>): la roja. Las gradas y la pancarta no "
-     "cambian.",
-     "And with the third (<code>0xADB8</code>): the red one. The stands and the "
-     "banner do not change."),
-    ("poses.png",
-     "Las 160 poses (<code>0xA4CE</code> y <code>0xA38E</code>), cada una montada "
-     "de sus cuatro sprites, con piel 0x0B, pelo 0x01 y camiseta roja.",
-     "The 160 poses (<code>0xA4CE</code> and <code>0xA38E</code>), each assembled "
-     "from its four sprites, with skin 0x0B, hair 0x01 and a red shirt."),
-    ("poses_azul.png",
-     "Lo mismo con piel 0x01, pelo 0x05 y la camiseta del otro equipo.",
-     "The same with skin 0x01, hair 0x05 and the other team's shirt."),
-    ("colores_jugadores.png",
-     "Los 32 aspectos de <code>0x80E4</code> (piel y pelo) sobre la pose del "
-     "saque, con las dos camisetas.",
-     "The 32 looks at <code>0x80E4</code> (skin and hair) on the tip-off pose, "
-     "with both shirts."),
-    ("sprites_fijos.png",
-     "La red en sus tres cuadros (<code>0x9665</code>), el balón, su sombra y la "
-     "flecha del cursor (<code>0x96C5</code>).",
-     "The net in its three frames (<code>0x9665</code>), the ball, its shadow and "
-     "the cursor arrow (<code>0x96C5</code>)."),
-    ("patrones_sprite.png",
-     "Los 196 patrones de sprite de los jugadores tal como quedan en RAM "
-     "(0xCC00-0xE47F).",
-     "The players' 196 sprite patterns as they sit in RAM (0xCC00-0xE47F)."),
-    ("tiles.png",
-     "Los 250 patrones de la pista, los menús y la fuente (<code>0xA74E</code>) "
-     "con los colores de la pista verde.",
-     "The 250 patterns of the court, the menus and the font (<code>0xA74E</code>) "
-     "with the green court's colours."),
-    ("tiles_logo.png",
-     "Los 80 patrones del logotipo (0xB0-0xFF, <code>0xB33E</code>) con sus "
-     "colores (<code>0xB491</code>).",
-     "The 80 logo patterns (0xB0-0xFF, <code>0xB33E</code>) with their colours "
-     "(<code>0xB491</code>)."),
-    ("sin_uso.png",
-     "Lo que no se pinta nunca: los patrones 0x73, 0x85 y 0x86 de la pista y la E "
-     "y la S de ESC; la C sale en el título.",
-     "What is never drawn: court patterns 0x73, 0x85 and 0x86 and the E and S of "
-     "ESC; the C does appear in the title."),
+    ("partido_original.png",
+     "El original en un MSX1 (C-BIOS_MSX1_JP): en este cuadro faltan "
+     "jugadores, y al del centro le faltan el pelo y la camiseta. 66,7 sprites "
+     "sin pintar por cuadro en treinta segundos de partido.",
+     "The original on an MSX1 (C-BIOS_MSX1_JP): in this frame players are "
+     "missing, and the one in the middle has no hair or shirt. 66.7 sprites "
+     "not drawn per frame over thirty seconds of a match."),
+    ("partido_msx2.png",
+     "El parcheado en el Philips NMS 8250: SCREEN 4, ocho sprites por línea, "
+     "todos los jugadores de la ventana enteros, con el balón y la red. 1,7 "
+     "sprites sin pintar por cuadro.",
+     "The patched cartridge on the Philips NMS 8250: SCREEN 4, eight sprites "
+     "per line, every player in the window whole, with the ball and the net. "
+     "1.7 sprites not drawn per frame."),
+    ("partido_msx1.png",
+     "El parcheado en un MSX1: las dos tablas siguen alternando, ahora en "
+     "0x3E00 y 0x3F00, y parpadea como el original.",
+     "The patched cartridge on an MSX1: the two tables still alternate, now "
+     "at 0x3E00 and 0x3F00, and it flickers as the original."),
+    ("trade_msx2.png",
+     "TRADE en el MSX2: la figura de muestra con su piel, su pelo y su "
+     "camiseta, copiados a la tabla de colores de sprite por "
+     "<code>0x6F30</code>.",
+     "TRADE on the MSX2: the sample figure with its skin, hair and shirt, "
+     "copied into the sprite colour table by <code>0x6F30</code>."),
 ]

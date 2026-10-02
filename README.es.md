@@ -1,46 +1,53 @@
-# Dunk Shot (MSX) — desensamblado comentado
+# Dunk Shot (MSX) — el parche MSX2 contra el parpadeo
 
 *(Also available [in English](README.md).)*
 
-Desensamblado comentado de **Dunk Shot** (HAL Laboratory, 1986), cartucho de
-32 KB para **MSX**: sin mapeador, en las páginas 1 y 2.
+Un parche extraoficial para **Dunk Shot** (HAL Laboratory, 1986), el cartucho
+de 32 KB para MSX. Cada jugador del juego son cuatro sprites y el MSX1 pinta
+cuatro por línea, así que el juego los reparte y los jugadores parpadean. Un
+MSX2 pinta ocho por línea: este parche lleva el juego a SCREEN 4 y apaga el
+reparto. En un MSX1 el mismo fichero se juega como el original.
 
-**La web**: https://antxiko.github.io/DunkShot-disassembly/es/
+**La web**: https://antxiko.github.io/DunkShot-MSX2-Patch/es/
 
 | | |
 |---|---|
-| explicado | 100 % (20.642 bytes de código, 12.126 de datos) |
-| comentado | 43,2 % de las instrucciones |
-| rutinas | 1.289, ninguna por debajo del 10 % |
-| reensamblado | la ROM, byte a byte |
-| imágenes | dibujadas desde la ROM; seis pantallas cotejadas contra openMSX, 0 diferencias |
+| el parche | `parche/dunkshot_msx2.ips`, 292 bytes |
+| bytes cambiados | 164, en 24 tramos; ningún patrón movido |
+| sprites sin pintar por cuadro | 66,7 (original, MSX1) → 1,7 (parcheado, MSX2) |
+| peor cuadro | 166 → 22 |
+| en un MSX1 | como el original |
+| probado | en openMSX (MSX1 y Philips NMS 8250); **todavía no en una máquina real** |
 
-## Qué hay
+No se distribuye ninguna ROM, ni la original ni la parcheada: pones tu propio
+volcado (sha256 `a1891e03...`) y el IPS hace el resto. El resultado tiene que
+dar sha256 `e5e14b0f...`.
 
-- El listado (`src/dunkshot.asm`), que se genera desde el binario y las notas y
-  reensambla la ROM exacta.
-- La pista entera de 56 columnas en sus tres colores, el título, los menús, la
-  ficha de equipo y el partido, montados desde las tablas del cartucho.
-- Los jugadores: 160 poses de cuatro sprites y 32 aspectos de piel y pelo.
-- Cómo funciona: la ventana de 32 columnas, el reparto de sprites que parpadea,
-  los equipos de la máquina por nivel, la cinta como BSAVE, las jugadas, los
-  cuatro compresores y el motor de sonido.
+## Cómo aplicarlo
 
-## Cómo reproducirlo
-
-Hace falta Python 3, GNU make, [Pasmo](https://pasmo.speccy.org/) y **tu propia
-imagen del cartucho** como `dunkshot.rom` en la raíz:
+Con cualquier herramienta de IPS, o como explica [Empezar](docs/es/EMPEZAR.md).
+Luego, en openMSX:
 
 ```
-sha256  a1891e038566596a9f67067b8ea4694709aa9fee93c8ac0379360b30ea3abe62
-make
+openmsx -machine Philips_NMS_8250 -cart dunkshot_msx2.rom
 ```
 
-Los detalles, en [Empezar](docs/es/EMPEZAR.md). `make parche` genera el
-[parche MSX2](docs/es/EL-PARCHE-MSX2.md), que quita casi todo el parpadeo en
-un MSX2 y sigue jugándose en un MSX1.
+## Cómo generarlo
+
+Hace falta Python 3, GNU make, [Pasmo](https://pasmo.speccy.org/) y tu volcado
+como `dunkshot.rom` en la raíz:
+
+```
+make            # listado, reensamblado, controles, el parche y los tests
+make parche     # solo el parche
+```
+
+Este repositorio parte del
+[desensamblado comentado de Dunk Shot](https://github.com/antxiko/DunkShot-disassembly),
+con su historial, así que cada dirección que toca el parche se puede buscar en
+`src/dunkshot.asm`.
 
 ## Aviso
 
-El juego es de HAL Laboratory; aquí solo están el análisis, los comentarios y
-las herramientas. La ROM no se distribuye. Ver [AVISO-LEGAL.md](AVISO-LEGAL.md).
+El juego es de HAL Laboratory; aquí solo están el parche, el análisis, los
+comentarios y las herramientas. Ver [AVISO-LEGAL.md](AVISO-LEGAL.md).

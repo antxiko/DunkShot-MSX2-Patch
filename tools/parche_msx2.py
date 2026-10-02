@@ -52,7 +52,7 @@ ORG = 0x4000
 
 GANCHO_INIGRP = 0xBFD4      # 31 bytes (relleno a 0xFF hasta 0xBFFF)
 R5_MAQUINA = 0xBFF3         # 11 bytes (hasta 0xBFFD)
-TABLA_COLORES = 0x6EA0      # 41 bytes (huerfano 0x6EA0-0x6EDC)
+TABLA_COLORES = 0x6EA0      # 38 bytes (huerfano 0x6EA0-0x6EC8)
 FIN_TABLA = 0x6EC9          # 14 bytes (hasta 0x6ED6)
 COLORES_MENU = 0x6F30       # 22 bytes (huerfano 0x6F30-0x6F47)
 VUELCA_COLORES = 0x7AAE     # 9 bytes (huerfano 0x7AAE-0x7ABD)
