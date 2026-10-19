@@ -73,7 +73,7 @@ class LasCifras(unittest.TestCase):
     def test_la_tabla_de_trozos_es_la_que_ensambla_la_herramienta(self):
         """Necesita pasmo, como el resto de `make` (PATH o PASMO=...)."""
         import parche_msx2 as p
-        medidos = {"0x%04X" % org: len(p.ensambla(n, org, f)) for n, (org, f) in p.TROZOS.items()}
+        medidos = {"0x%04X" % org: len(p.ensambla(n, f)) for n, (org, _, f) in p.trozos("1").items()}
         for fn in (("docs", "THE-PATCH.md"), ("docs", "es", "EL-PARCHE.md")):
             filas = dict(re.findall(r"^\|[^|]+\| (0x[0-9A-F]{4}) \| (\d+) \|$", texto(*fn), re.M))
             self.assertEqual({k: int(v) for k, v in filas.items()}, medidos, fn)

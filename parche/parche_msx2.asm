@@ -67,7 +67,7 @@ fin_tabla:               ; HL = la entrada de atributos donde acaba la lista
 
 ; ---- colores_menu ----
     org 0x6F30
-colores_menu:            ; el final de viste_jugador (0x80CE): su bucle y luego los colores
+colores_menu:            ; el final de viste_jugador: su bucle y luego los colores
     dec b
     jp nz,0x80B8         ; los cuatro atributos de la figura
     ld hl,0x3E00         ; los 8 atributos de las dos figuras, de la VRAM
@@ -80,6 +80,6 @@ colores_menu:            ; el final de viste_jugador (0x80CE): su bucle y luego 
 ; ---- vuelca_colores ----
     org 0x7AAE
 vuelca_colores:          ; el final de vuelca_sprites: la segunda copia y los colores
-    call 0x5B07          ; copia_a_vram: 0xE730 a 0x3F00, como antes
+    call 0x5B07          ; copia_a_vram: la lista a 0x3F00, como antes
     ld hl,0xE7B3         ; el color del sprite 0 de la lista rotada, la que se ve en MSX2
     jp 0x6EA0            ; tabla_colores
